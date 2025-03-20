@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import furnitureRoutes from './routes/furnitureRoutes'
 
@@ -10,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(furnitureRoutes)
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Да нахер этот диплом!');
+  res.send('Kawabanga');
 });
 
 app.get('*', (req: Request, res: Response) => {

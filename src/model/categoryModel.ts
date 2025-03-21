@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 // Определяем интерфейс для TypeScript
 interface ICategory extends Document {
@@ -13,6 +13,6 @@ const CategorySchema: Schema = new Schema({
 });
 
 // Создаем модель Mongoose
-const Category = mongoose.model<ICategory>('Category', CategorySchema);
+const Category = mongoose.model<ICategory>("Category", CategorySchema);
 
 export default Category;

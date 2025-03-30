@@ -1,10 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
-
-// Определяем интерфейс для TypeScript
-interface ICategory extends Document {
-  imageSrc: string;
-  category: string;
-}
+import mongoose, { Schema } from "mongoose";
+import { ICategory } from "../types";
 
 // Создаем схему Mongoose
 const CategorySchema: Schema = new Schema({

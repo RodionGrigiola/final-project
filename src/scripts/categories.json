@@ -1,14 +1,26 @@
 [
   {
-    "imageSrc": "https://example.com/image1.jpg",
-    "category": "Furniture"
+    "imageSrc": "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c",
+    "category": "tables"
   },
   {
-    "imageSrc": "https://example.com/image2.jpg",
-    "category": "Electronics"
+    "imageSrc": "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91",
+    "category": "chairs"
   },
   {
-    "imageSrc": "https://example.com/image3.jpg",
-    "category": "Clothing"
+    "imageSrc": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc",
+    "category": "sofas"
+  },
+  {
+    "imageSrc": "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg",
+    "category": "drawers"
+  },
+  {
+    "imageSrc": "https://images.pexels.com/photos/276528/pexels-photo-276528.jpeg",
+    "category": "doors"
+  },
+  {
+    "imageSrc": "https://images.pexels.com/photos/4352247/pexels-photo-4352247.jpeg",
+    "category": "cabinets"
   }
 ]

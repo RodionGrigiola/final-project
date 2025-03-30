@@ -1,8 +1,45 @@
 import "dotenv/config";
-import mongoose from "mongoose";
-import fs from "fs";
-import path from "path";
-import Item from "../model/itemModel.js";
+import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
+import Item from '../model/itemModel';
+
+// 1. Получаем абсолютный путь к папке models
+const modelsDir = path.join(__dirname, '../public/models');
+
+const importModels = async () => {
+  try {
+    // 2. Проверяем существование папки
+    if (!fs.existsSync(modelsDir)) {
+      throw new Error(`Directory ${modelsDir} not found`);
+    }
+
+    const categories = fs.readdirSync(modelsDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+
+    for (const category of categories) {
+      const categoryPath = path.join(modelsDir, category);
+      const models = fs.readdirSync(categoryPath)
+        .filter(file => file.endsWith('.glb'));
+
+      for (const modelFile of models) {
+        await Item.create({
+          type: 'glb',
+          src: `/models/${category}/${modelFile}`,
+          properties: {
+            category,
+            name: path.parse(modelFile).name
+          }
+        });
+        console.log(`Added: ${category}/${modelFile}`);
+      }
+    }
+  } catch (err) {
+    console.error('Error in importModels:', err);
+    throw err; // Пробрасываем ошибку для обработки в основном потоке
+  }
+};
 
 const DB_URL = process.env.DATABASE_URL;
 const DB_PASSWORD = process.env.DATABASE_PASSWORD;
@@ -15,34 +52,14 @@ if (!DB_URL || !DB_PASSWORD) {
 
 const DB = DB_URL.replace("<db_password>", DB_PASSWORD);
 
-mongoose.connect(DB).then(async () => {
-  try {
-    const dataPath = path.join(__dirname, "items.json");
-    const rawData = fs.readFileSync(dataPath, "utf-8");
-    const items = JSON.parse(rawData);
-
-    // Удаляем все существующие данные (опционально)
-    await Item.deleteMany({});
-    console.log("Existing data cleared");
-
-    // Создаем новые объекты и сохраняем их в базу данных
-    const createdItems = await Promise.all(
-      items.map(async (item: { imageSrc: string; category: string }) => {
-        const newItem = new Item(item);
-        return await newItem.save();
-      }),
-    );
-    console.log("Database seeded successfully:", createdItems);
-  } catch (error) {
-    console.error("Error seeding database:", error);
-  } finally {
-    // Закрываем соединение с базой данных
-    mongoose.connection.close();
-  }
-});
-
-// const port = process.env.PORT || 3000;
-
-// const server = app.listen(port, () => {
-//     console.log("listening");
-//   });
+// 3. Подключение и запуск
+mongoose.connect(DB)
+  .then(() => importModels())
+  .then(() => {
+    console.log('✅ All models seeded successfully');
+    return mongoose.connection.close();
+  })
+  .catch(err => {
+    console.error('❌ Seeding failed:', err);
+    process.exit(1);
+  });

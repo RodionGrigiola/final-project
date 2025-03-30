@@ -27,6 +27,8 @@ export default [
     rules: {
       ...pluginJs.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
+      ignoreRestSiblings: true,
+      args: "after-used",
       "prettier/prettier": "error",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-explicit-any": "off",

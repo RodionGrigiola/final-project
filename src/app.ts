@@ -3,8 +3,15 @@ import furnitureCategoryRouter from "./routes/furnitureCategoryRoute";
 import furnitureItemsRouter from "./routes/furnitureItemsRoute";
 import userRouter from "./routes/userRoute";
 import path from 'node:path';
+import cors from "cors";
 
 const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true 
+}));
+
 
 app.use('/models', express.static(path.join(__dirname, 'public/models')));
 

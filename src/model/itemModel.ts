@@ -11,7 +11,7 @@ const ItemSchema = new Schema<IItem>(
     type: {
       type: String,
       required: true,
-      enum: ["glb"],
+      enum: ["gltf"],
     },
     properties: {
       category: {
@@ -23,7 +23,6 @@ const ItemSchema = new Schema<IItem>(
         type: String,
         required: true,
       },
-      // Дополнительные параметры
       scale: {
         type: Number,
         default: 1.0,

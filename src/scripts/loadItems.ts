@@ -25,7 +25,7 @@ const importModels = async () => {
 
       for (const modelFile of models) {
         await Item.create({
-          type: 'glb',
+          type: 'gltf',
           src: `/models/${category}/${modelFile}`,
           properties: {
             category,

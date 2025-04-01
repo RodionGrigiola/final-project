@@ -10,7 +10,7 @@ export type CategoryResponse = ICategory | null;
 
 export interface IItem extends Document {
   src: string; // Путь к файлу (например: "/models/armchairs/armchair001.glb")
-  type: "glb";
+  type: "gltf";
   properties: {
     category: string;
     name: string;
@@ -25,6 +25,7 @@ export interface IItem extends Document {
 export type ItemResponse = IItem | null;
 
 export interface IUser extends Document {
+  correctPassword(password: string, password1: string): Promise<boolean>;
   name: string;
   email: string;
   photo?: string;
@@ -34,3 +35,5 @@ export interface IUser extends Document {
   // createdAt: Date;  // Added by timestamps
   // updatedAt: Date;  // Added by timestamps
 }
+
+export * from './express';

@@ -144,7 +144,8 @@ const forgotPassword = async (req: Request, res: Response, next: NextFunction) =
   await user.save({ validateBeforeSave: false });
 
   try {
-    const resetURL = `${req.protocol}://${req.get('host')}/users/resetPassword/${resetToken}`;
+    // const resetURL = `${req.protocol}://${req.get('host')}/users/resetPassword/${resetToken}`;
+    const resetURL = `${req.protocol}://localhost:5173/reset-password/${resetToken}`;
     await new Email(user, resetURL).sendPasswordReset();
     res.status(200).json({
       status: 'success',
@@ -223,9 +224,35 @@ const getMe = (req: Request, res: Response) => {
   })
 }
 
+
+// For PATCH /users/updateMe
+const updateMe = async (req: Request, res: Response) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req?.user?._id,
+      {
+        name: req.body.name,
+        email: req.body.email,
+        photo: req.body.photo,
+      },
+      { new: true, runValidators: true }
+    );
+
+    console.log(updatedUser)
+    
+    res.status(200).json({
+      user: updatedUser
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: 'Update failed'
+    });
+  }
+};
+
 const test = (req: Request, res: Response) => {
   res.status(200).send("<h1>Access granted to restricted resourse</h1>")
 }
 
-export default { signup, login, logout, protect, forgotPassword, resetPassword, updatePassword, getMe, test };
+export default { signup, login, logout, protect, forgotPassword, resetPassword, updatePassword, getMe, updateMe, test };
 

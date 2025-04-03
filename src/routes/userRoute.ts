@@ -20,5 +20,6 @@ router.patch('/updatePassword', authController.protect, authController.updatePas
 
 
 router.route("/me").get(authController.protect, authController.getMe)
+router.route("/updateMe").patch(authController.protect, uploadUserPhoto, processUserPhoto, authController.updateMe)
 
 export default router;

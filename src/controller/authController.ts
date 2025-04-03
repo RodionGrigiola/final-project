@@ -1,18 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../model/userModel";
-import { IUser } from "../types";
+import { IUser, JwtPayload } from "../types";
 import Email from "../services/Email";
 import jwt from "jsonwebtoken";
-import { promisify } from 'util';
 import { ObjectId } from 'mongoose';
+import crypto from "crypto";
 
-interface JwtPayload {
-  kek: string;
-  id: string
-}
-
-// Убедитесь, что JWT_SECRET точно определен в .env
-const JWT_SECRET = process.env.JWT_SECRET as string; // Явное приведение типа
+const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '90d';
 
 const signToken = (id: ObjectId) => {
@@ -55,9 +49,8 @@ const signup = async (req: Request, res: Response) => {
       role,
       photo: req.body.photo,
     });
-    // const url = `${req.protocol}://${req.get("host")}/me`;
-    // const url = `<a href="#">user_link</a>`;
-    // new Email(user, url).sendWelcome().catch(console.error);
+    const url = `${req.protocol}://${req.get("host")}/users/me`;
+    new Email(user, url).sendWelcome().catch(console.error);
     createSendToken(user, 201, res);
   } catch (e) {
     res.status(400).json({
@@ -92,7 +85,6 @@ const login = async (req: Request, res: Response) => {
     });
   }
 };
-
 
 const verifyToken = (token: string): JwtPayload => {
   return jwt.verify(token, JWT_SECRET) as JwtPayload;
@@ -140,8 +132,100 @@ const logout = (req: Request, res: Response) => {
   res.status(200).json({ status: 'success' });
 };
 
+// auth.controller.ts
+const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  const user: IUser | null = await User.findOne({ email: req.body.email });
+  if (!user) {
+    res.status(404).send("There is no user with that email address");
+    return;
+  }
+
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  try {
+    const resetURL = `${req.protocol}://${req.get('host')}/users/resetPassword/${resetToken}`;
+    await new Email(user, resetURL).sendPasswordReset();
+    res.status(200).json({
+      status: 'success',
+      message: 'Token sent to email!',
+    });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    res.status(500).send("There was an error sending the email. Try again later");
+    return;
+  }
+};
+
+const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user: IUser | null = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    res.status(400).send("Token is invalid or has expired");
+    return;
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirmation = req.body.passwordConfirmation;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  
+  await user.save();
+
+  // 3) Log the user in, send JWT
+  createSendToken(user, 200, res);
+  }
+  catch(e){
+    res.send(400).send("Error resetting password")
+  }
+};
+
+const updatePassword = async (req: Request, res: Response) => {
+  // 1) Get user from DB
+  const user = await User.findById(req?.user?._id).select('+password');
+  if (!user) {
+    res.status(400).send("You are not logged in! Please login");
+    // return next(new AppError('You are not logged in! Please login', 400));
+    return;
+  }
+
+  // 2) Check if posted pwd is correct and update
+  if (!(await user.correctPassword(req.body.password, user.password))) {
+    // return next(new AppError('Your current password is wrong', 401));
+    res.status(401).send("Your current password is wrong");
+    return;
+  }
+
+  // 3) Update the password
+  user.password = req.body.newPassword;
+  user.passwordConfirmation = req.body.newPasswordConfirmation;
+  await user.save();
+
+  // 4) Log the user in
+  createSendToken(user, 200, res);
+};
+
+const getMe = (req: Request, res: Response) => {
+  res.status(200).json({
+    user: req.user
+  })
+}
+
 const test = (req: Request, res: Response) => {
   res.status(200).send("<h1>Access granted to restricted resourse</h1>")
 }
 
-export default { signup, login, logout, protect, test };
+export default { signup, login, logout, protect, forgotPassword, resetPassword, updatePassword, getMe, test };
+

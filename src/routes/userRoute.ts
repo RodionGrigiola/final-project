@@ -13,8 +13,12 @@ router.route("/login").post(authController.login);
 
 router.route("/test-protect").get(authController.protect, authController.test)
 router.route("/logout").get(authController.logout)
+router.post('/forgotPassword', authController.forgotPassword);
+router.patch('/resetPassword/:token', authController.resetPassword);
+router.patch('/updatePassword', authController.protect, authController.updatePassword);
 
 
-// router.route("/me").get(userController.get)
+
+router.route("/me").get(authController.protect, authController.getMe)
 
 export default router;

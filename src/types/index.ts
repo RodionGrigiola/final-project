@@ -22,16 +22,26 @@ export interface IItem extends Document {
   updatedAt: Date;
 }
 
+export interface JwtPayload {
+  kek: string;
+  id: string
+}
+
 export type ItemResponse = IItem | null;
 
 export interface IUser extends Document {
   correctPassword(password: string, password1: string): Promise<boolean>;
+  createPasswordResetToken(): string;
   name: string;
   email: string;
   photo?: string;
   role: "user" | "admin";
   password: string;
+  passwordConfirmation?: string;
   active: boolean;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+  passwordChangedAt?: Date,
   // createdAt: Date;  // Added by timestamps
   // updatedAt: Date;  // Added by timestamps
 }

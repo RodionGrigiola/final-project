@@ -1,11 +1,84 @@
+//- welcome.pug
 doctype html
-html
+html(lang="en")
   head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Welcome to Our Community
     style.
-      .header { color: #2d3436; }
+      body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #2d3436;
+      }
+      .logo {
+        max-width: 150px;
+        margin-bottom: 20px;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #0984e3;
+        color: white !important;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        margin: 20px 0;
+        text-align: center;
+      }
+      .content {
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      }
+      .footer {
+        margin-top: 30px;
+        font-size: 12px;
+        color: #777;
+        text-align: center;
+      }
+      .emoji {
+        font-size: 24px;
+        vertical-align: middle;
+      }
+      p {
+        margin: 15px 0;
+      }
   body
-    h1.header Hi #{firstName},
-    p Welcome to our amazing community! 🎉
-    p We're excited to have you on board.
-    if url
-      a(href=`${url}`) Verify your account
+    .content
+      .header
+        if logo
+          img.logo(src=logo, alt="Company Logo")
+        h1 Hi #{name}, 
+          span.emoji 🎉
+
+      p We're thrilled to welcome you to our amazing community!
+      p Here's what you can look forward to:
+      ul
+        li Access to exclusive content
+        li A supportive network of peers
+        li Regular updates and news
+
+      if url
+        div(style="text-align: center; margin: 25px 0;")
+          a.button(href=url) Check Out Your New Account
+        p If you didn't create an account with us, please ignore this email.
+
+      p(style="margin-top: 20px;") We're here to help if you have any questions. Just reply to this email!
+
+    .footer
+      p © #{new Date().getFullYear()} #{appName || 'Our Community'}. All rights reserved.
+      p You're receiving this email because you signed up for an account.
+      if url
+        p Trouble with the button? Copy and paste this link into your browser:
+        p(style="font-family: monospace; background: #f4f4f4; padding: 10px; border-radius: 4px; word-break: break-all;") #{url}

@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import pug from "pug";
 import { IUser } from "../types";
+import path from 'path';
 
 class Email {
   private to: string;
@@ -42,12 +43,18 @@ class Email {
   }
 
   // 2. Send the actual email
-  private async send(template: string, subject: string) {
+  private async send(template: string, subject: string, templateVars?: Record<string, any>) {
     // Render HTML from Pug template
-    const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
-      name: this.name,
-      url: this.url,
-    });
+    const html = pug.renderFile(
+      path.join(__dirname, `../views/email/${template}.pug`),
+      {
+        name: this.name,
+        url: this.url,
+        appName: "Furniture Picker", // Default app name
+        expiresIn: 10, // Default expiration in minutes
+        ...templateVars // Allow custom variables to override defaults
+      }
+    );
 
     // Mail options
     const mailOptions = {
@@ -64,6 +71,16 @@ class Email {
   // 3. Welcome email method
   async sendWelcome() {
     await this.send("welcome", "Welcome to Our App!");
+  }
+
+  async sendPasswordReset() {
+    await this.send("resetPassword",
+      "Your password reset token (valid for 10 minutes)",
+      {
+        resetURL: this.url,
+        // You can add additional template variables here
+        // logo: "https://yourdomain.com/logo.png"
+      });
   }
 }
 

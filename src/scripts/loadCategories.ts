@@ -1,45 +1,58 @@
 import "dotenv/config";
-import mongoose from "mongoose";
-import fs from "fs";
-import path from "path";
-// import { ICategory } from "../types";
-import Category from "../model/categoryModel";
+import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
+import Category from '../model/categoryModel'; // Adjust path as needed
 
-const DB_URL = process.env.DATABASE_URL;
-const DB_PASSWORD = process.env.DATABASE_PASSWORD;
+const imagesDir = path.join(__dirname, '../public/images');
 
-if (!DB_URL || !DB_PASSWORD) {
-  throw new Error(
-    "Database URL or password is missing in environment variables",
-  );
+const importCategories = async () => {
+  try {
+    if (!fs.existsSync(imagesDir)) {
+      throw new Error(`Images directory not found at: ${imagesDir}`);
+    }
+
+    const imageFiles = fs.readdirSync(imagesDir)
+      .filter(file => ['.jpg', '.jpeg', '.png', '.webp']
+        .includes(path.extname(file).toLowerCase()));
+
+    // Create categories
+    for (const file of imageFiles) {
+      let categoryName = path.parse(file).name; // Remove extension
+
+      if (!categoryName.endsWith('furniture')) categoryName += 's';
+      
+      await Category.create({
+        category: categoryName,
+        imageSrc: `/images/${file}` // Relative path from public
+      });
+
+      console.log(`Created category: ${categoryName}`);
+    }
+
+  } catch (err) {
+    console.error('Error importing categories:', err);
+    throw err;
+  }
+};
+
+// Database connection
+const DB_URL = process.env.DATABASE_URL?.replace(
+  "<db_password>", 
+  process.env.DATABASE_PASSWORD || ""
+);
+
+if (!DB_URL) {
+  throw new Error("Database URL is missing in environment variables");
 }
 
-const DB = DB_URL.replace("<db_password>", DB_PASSWORD);
-
-mongoose.connect(DB).then(async () => {
-  try {
-    const dataPath = path.join(__dirname, "categories.json");
-    const rawData = fs.readFileSync(dataPath, "utf-8");
-    const categories = JSON.parse(rawData);
-
-    // Удаляем все существующие данные (опционально)
-    await Category.deleteMany({});
-    console.log("Existing data cleared");
-
-    // Создаем новые объекты и сохраняем их в базу данных
-    const createdCategories = await Promise.all(
-      categories.map(
-        async (category: { imageSrc: string; category: string }) => {
-          const newCategory = new Category(category);
-          return await newCategory.save();
-        },
-      ),
-    );
-    console.log("Database seeded successfully:", createdCategories);
-  } catch (error) {
-    console.error("Error seeding database:", error);
-  } finally {
-    // Закрываем соединение с базой данных
-    mongoose.connection.close();
-  }
-});
+mongoose.connect(DB_URL)
+  .then(() => importCategories())
+  .then(() => {
+    console.log('✅ Categories imported successfully');
+    return mongoose.connection.close();
+  })
+  .catch(err => {
+    console.error('❌ Import failed:', err);
+    process.exit(1);
+  });

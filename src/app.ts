@@ -14,10 +14,12 @@ app.use(cors({
 }));
 
 app.use('/models', express.static(path.join(__dirname, 'public/models')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use("/furnitureCategory", furnitureCategoryRouter);
 app.use("/furniture", furnitureItemsRouter);
 app.use("/users", userRouter);

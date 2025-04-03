@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import { IUser } from "../types";
+import crypto from 'crypto';
 import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
@@ -44,9 +45,9 @@ const userSchema = new mongoose.Schema(
         message: `Passwords don't match!`,
       },
     },
-    // passwordChangedAt: Date,
-    // passwordResetToken: String,
-    // passwordResetExpires: Date,
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
     active: {
       type: Boolean,
       default: true,
@@ -73,6 +74,16 @@ userSchema.methods.correctPassword = async function (
   userPassword: string
 ): Promise<boolean> {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.createPasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  this.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  return resetToken;
 };
 
 const User = mongoose.model<IUser>("User", userSchema);

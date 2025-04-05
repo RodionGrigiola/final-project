@@ -27,6 +27,7 @@ const importModels = async () => {
         await Item.create({
           type: 'gltf',
           src: `/models/${category}/${modelFile}`,
+          imageSrc: `/images/items/${category}/${modelFile.replace(/\.glb$/, ".png")}`,
           properties: {
             category,
             name: path.parse(modelFile).name

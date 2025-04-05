@@ -8,6 +8,7 @@ const ItemSchema = new Schema<IItem>(
       required: true,
       unique: true,
     },
+    imageSrc: String,
     type: {
       type: String,
       required: true,
@@ -43,6 +44,7 @@ const ItemSchema = new Schema<IItem>(
       transform: function(doc, ret) {
         ret.id = ret._id;
         ret.src = `${process.env.BASE_URL || 'http://localhost:3000'}${ret.src}`;
+        ret.imageSrc = `${process.env.BASE_URL || 'http://localhost:3000'}${ret.imageSrc}`;
         delete ret._id;
         delete ret.__v;
         delete ret.updatedAt;

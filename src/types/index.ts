@@ -10,6 +10,7 @@ export type CategoryResponse = ICategory | null;
 
 export interface IItem extends Document {
   src: string; // Путь к файлу (например: "/models/armchairs/armchair001.glb")
+  imageSrc: string;
   type: "gltf";
   properties: {
     category: string;

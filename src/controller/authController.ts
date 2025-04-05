@@ -91,6 +91,7 @@ const verifyToken = (token: string): JwtPayload => {
 };
 
 const protect = async (req: Request, res: Response, next: NextFunction) => {
+  console.log('insiede protect')
   try {
     // 1. Получаем токен
     let token;
@@ -194,6 +195,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 const updatePassword = async (req: Request, res: Response) => {
+  console.log('inside update')
   // 1) Get user from DB
   const user = await User.findById(req?.user?._id).select('+password');
   if (!user) {
@@ -203,7 +205,7 @@ const updatePassword = async (req: Request, res: Response) => {
   }
 
   // 2) Check if posted pwd is correct and update
-  if (!(await user.correctPassword(req.body.password, user.password))) {
+  if (!(await user.correctPassword(req.body.currentPassword, user.password))) {
     // return next(new AppError('Your current password is wrong', 401));
     res.status(401).send("Your current password is wrong");
     return;
@@ -214,6 +216,7 @@ const updatePassword = async (req: Request, res: Response) => {
   user.passwordConfirmation = req.body.newPasswordConfirmation;
   await user.save();
 
+  console.log('success')
   // 4) Log the user in
   createSendToken(user, 200, res);
 };

@@ -6,6 +6,19 @@ export interface ICategory extends Document {
   category: string;
 }
 
+export enum ItemCategory {
+  TABLES = 'tables',
+  CHAIRS = 'chairs',
+  ARMCHAIRS = 'armchairs',
+  BATHROOM = 'bathroom',
+  KITCHENS = 'kitchens',
+  WINDOWS = 'windows',
+  DOORS = 'doors',
+  BEDS = 'beds',
+  SOFAS = 'sofas',
+  RACKS = 'racks'
+}
+
 export type CategoryResponse = ICategory | null;
 
 export interface IItem extends Document {

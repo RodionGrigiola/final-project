@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import Item from "../model/itemModel";
-import { ItemResponse } from "../types";
+import { CategoryResponse, IItem, ItemCategory, ItemResponse } from "../types";
 import { paginate } from "../utils/paginate";
+import Category from '../model/categoryModel';
 
 const getAllFurniture = async (req: Request, res: Response) => {
   try {
@@ -31,4 +32,30 @@ const getFurnitureItemById = async (req: Request, res: Response) => {
   }
 };
 
-export default { getAllFurniture, getFurnitureItemById };
+const getFurnitureItemsByCategory = async (req: Request, res: Response) => {
+  try {
+    if (!req.params.categoryId) {
+      res.status(400).json({ error: 'Category parameter is required' });
+      return;
+    }
+
+    const response: CategoryResponse = await Category.findById(req.params.categoryId);
+    if (!response?.category) {
+      res.status(404).json({ error: 'Category not found' });
+      return;
+    }
+    
+    const items: IItem[] = await Item.find({ 
+      'properties.category': response.category
+    });
+    
+    res.status(200).json({
+      items,
+    });
+  }
+  catch (e) {
+    res.status(500).json({ "Error: ": e });
+  }
+}
+
+export default { getAllFurniture, getFurnitureItemById, getFurnitureItemsByCategory };

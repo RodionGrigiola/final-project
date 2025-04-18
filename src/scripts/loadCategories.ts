@@ -37,14 +37,16 @@ const importCategories = async () => {
 };
 
 // Database connection
-const DB_URL = process.env.DATABASE_URL?.replace(
-  "<db_password>", 
-  process.env.DATABASE_PASSWORD || ""
-);
+// const DB_URL = process.env.DATABASE_URL?.replace(
+//   "<db_password>", 
+//   process.env.DATABASE_PASSWORD || ""
+// );
 
-if (!DB_URL) {
-  throw new Error("Database URL is missing in environment variables");
-}
+// if (!DB_URL) {
+//   throw new Error("Database URL is missing in environment variables");
+// }
+
+const DB_URL = process.env.TEST_DATABASE as string;
 
 mongoose.connect(DB_URL)
   .then(() => importCategories())

@@ -42,16 +42,16 @@ const importModels = async () => {
   }
 };
 
-const DB_URL = process.env.DATABASE_URL;
-const DB_PASSWORD = process.env.DATABASE_PASSWORD;
+const DB = process.env.TEST_DATABASE as string;
+// const DB_PASSWORD = process.env.DATABASE_PASSWORD;
 
-if (!DB_URL || !DB_PASSWORD) {
-  throw new Error(
-    "Database URL or password is missing in environment variables",
-  );
-}
+// if (!DB_URL || !DB_PASSWORD) {
+//   throw new Error(
+//     "Database URL or password is missing in environment variables",
+//   );
+// }
 
-const DB = DB_URL.replace("<db_password>", DB_PASSWORD);
+// const DB = DB_URL.replace("<db_password>", DB_PASSWORD);
 
 // 3. Подключение и запуск
 mongoose.connect(DB)

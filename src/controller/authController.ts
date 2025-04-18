@@ -68,9 +68,8 @@ const login = async (req: Request, res: Response) => {
       return;
     }
 
-    const user: IUser = await User.findOne({ email }).select('-__v +password'); // bcs in schema select: false
-    const correct = await user.correctPassword(password, user.password);
-
+    const user: IUser | null = await User.findOne({ email }).select('-__v +password'); // bcs in schema select: false
+    const correct = await user?.correctPassword(password, user.password);
     if (!user || !correct) {
       res.status(401).json({error_message: "Incorrect email or password"});
       return;
@@ -240,8 +239,6 @@ const updateMe = async (req: Request, res: Response) => {
       },
       { new: true, runValidators: true }
     );
-
-    console.log(updatedUser)
     
     res.status(200).json({
       user: updatedUser

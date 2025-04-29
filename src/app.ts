@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import furnitureCategoryRouter from "./routes/furnitureCategoryRoute";
 import furnitureItemsRouter from "./routes/furnitureItemsRoute";
 import userRouter from "./routes/userRoute";
+import projectsRouter from "./routes/projectsRoute"; 
 import path from 'node:path';
 import cors from "cors";
 import cookieParser from 'cookie-parser';
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use("/furnitureCategory", furnitureCategoryRouter);
 app.use("/furniture", furnitureItemsRouter);
 app.use("/users", userRouter);
+app.use("/project", projectsRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).send("<h1>App is running</h1>");

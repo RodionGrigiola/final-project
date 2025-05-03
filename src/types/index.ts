@@ -60,4 +60,11 @@ export interface IUser extends Document {
   // updatedAt: Date;  // Added by timestamps
 }
 
+export interface IProject extends Document {
+  _id: Types.ObjectId;
+  userId: string;
+  name: string;
+  data: string;
+}
+
 export * from './express';
